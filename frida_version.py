@@ -45,7 +45,7 @@ def detect(repo: Path) -> FridaVersion:
         return FridaVersion(version_name, major, minor, micro, nano, commit)
 
     proc = subprocess.run(
-        ["git", "describe", "--tags", "--always", "--long"],
+        ["git", "describe", "--tags", "--always", "--long", "--match", "[0-9]*.[0-9]*.[0-9]*"],
         cwd=repo,
         capture_output=True,
         encoding="utf-8",
