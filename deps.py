@@ -314,6 +314,13 @@ class Builder:
         self._build_machine = build_machine.default_missing().maybe_adapt_to_host(self._host_machine)
         self._verbose = verbose
         self._default_library = "static"
+        raw_build_jobs = os.environ.get("FRIDA_BUILD_JOBS")
+        try:
+            self._build_jobs = int(raw_build_jobs) if raw_build_jobs is not None else None
+        except ValueError as e:
+            raise CommandError("FRIDA_BUILD_JOBS must be a positive integer") from e
+        if self._build_jobs is not None and self._build_jobs < 1:
+            raise CommandError("FRIDA_BUILD_JOBS must be a positive integer")
 
         self._params = load_dependency_parameters()
         self._cachedir = detect_cache_dir(ROOT_DIR)
@@ -593,7 +600,14 @@ class Builder:
                          cwd=sourcedir,
                          **meson_kwargs)
 
-        self._call_meson(["install"],
+        install_args = ["install"]
+        if self._build_jobs is not None:
+            self._call_meson(["compile", "-j", str(self._build_jobs)],
+                             cwd=builddir,
+                             **meson_kwargs)
+            install_args.append("--no-rebuild")
+
+        self._call_meson(install_args,
                          cwd=builddir,
                          **meson_kwargs)
 
