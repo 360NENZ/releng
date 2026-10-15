@@ -23,10 +23,15 @@ ENUM_VALUES = re.compile(
     re.DOTALL,
 )
 ENUM_VALUE_NAME = re.compile(rb'"FRIDA_([A-Z0-9_]+)"')
+SOURCE_LINE = re.compile(rb'(?m)^(#line\s+\d+\s+")([^"\r\n]+)(")$')
 
 
 def neutralize_task_names(source: bytes) -> bytes:
     return TASK_NAME.sub(rb'\g<1>Meshlink.', source)
+
+
+def neutralize_source_locations(source: bytes) -> bytes:
+    return SOURCE_LINE.sub(lambda match: match[1] + match[2].replace(b"frida", b"meshlink") + match[3], source)
 
 
 def neutralize_runtime_types(source: bytes) -> bytes:
@@ -61,7 +66,7 @@ def output_directory(arguments: list[str]) -> Path | None:
 def neutralize_directory(directory: Path) -> None:
     for generated in directory.rglob("*.c"):
         source = generated.read_bytes()
-        updated = neutralize_runtime_types(neutralize_task_names(source))
+        updated = neutralize_source_locations(neutralize_runtime_types(neutralize_task_names(source)))
         if updated != source:
             generated.write_bytes(updated)
 

@@ -5,6 +5,7 @@ from tempfile import TemporaryDirectory
 from releng.neutral_valac import (
     neutralize_directory,
     neutralize_runtime_types,
+    neutralize_source_locations,
     neutralize_task_names,
     output_directory,
 )
@@ -27,6 +28,19 @@ class NeutralValacTest(unittest.TestCase):
         self.assertEqual(output_directory(["-C", "--directory", "out"]), Path("out"))
         self.assertEqual(output_directory(["-C", "--directory=out"]), Path("out"))
         self.assertIsNone(output_directory(["--version"]))
+
+    def test_rewrites_generated_source_locations_only(self):
+        source = (
+            b'#line 6 "../subprojects/frida-core/src/linux/frida-helper.vala"\n'
+            b'#line 42 "/home/user/frida/subprojects/frida-gum/gum.c"\n'
+            b'const char *path = "../subprojects/frida-core/src/frida.vala";\n'
+        )
+        expected = (
+            b'#line 6 "../subprojects/meshlink-core/src/linux/meshlink-helper.vala"\n'
+            b'#line 42 "/home/user/meshlink/subprojects/meshlink-gum/gum.c"\n'
+            b'const char *path = "../subprojects/frida-core/src/frida.vala";\n'
+        )
+        self.assertEqual(neutralize_source_locations(source), expected)
 
     def test_rewrites_type_registration_and_enum_metadata_only(self):
         source = (
