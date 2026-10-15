@@ -4,6 +4,7 @@ from tempfile import TemporaryDirectory
 
 from releng.neutral_valac import (
     neutralize_directory,
+    neutralize_diagnostics,
     neutralize_runtime_types,
     neutralize_source_locations,
     neutralize_task_names,
@@ -41,6 +42,23 @@ class NeutralValacTest(unittest.TestCase):
             b'const char *path = "../subprojects/frida-core/src/frida.vala";\n'
         )
         self.assertEqual(neutralize_source_locations(source), expected)
+
+    def test_rewrites_generated_diagnostics_without_renaming_symbols(self):
+        source = (
+            b'#define _vala_return_if_fail(expr, msg) if G_LIKELY (expr) ; else '
+            b'{ g_return_if_fail_warning (G_LOG_DOMAIN, G_STRFUNC, msg); return; }\n'
+            b"g_critical (\"Type `%s' does not implement abstract method "
+            b"`frida_barebone_agent_config_check'\", g_type_name (type));\n"
+            b'const char *actual_symbol = "frida_barebone_agent_config_check";\n'
+            b'other_warning (G_STRFUNC);\n'
+        )
+        expected = source.replace(
+            b'G_LOG_DOMAIN, G_STRFUNC, msg', b'G_LOG_DOMAIN, "meshlink", msg'
+        ).replace(
+            b"does not implement abstract method `frida_barebone_agent_config_check'",
+            b"does not implement abstract method from this interface",
+        )
+        self.assertEqual(neutralize_diagnostics(source), expected)
 
     def test_rewrites_type_registration_and_enum_metadata_only(self):
         source = (

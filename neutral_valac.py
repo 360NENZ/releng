@@ -24,6 +24,10 @@ ENUM_VALUES = re.compile(
 )
 ENUM_VALUE_NAME = re.compile(rb'"FRIDA_([A-Z0-9_]+)"')
 SOURCE_LINE = re.compile(rb'(?m)^(#line\s+\d+\s+")([^"\r\n]+)(")$')
+VALA_DIAGNOSTIC_FUNCTION = re.compile(
+    rb'(?m)^(#define _vala_(?:assert|return_if_fail|return_val_if_fail|warn_if_fail)\([^\n]+?)G_STRFUNC'
+)
+ABSTRACT_METHOD_DIAGNOSTIC = re.compile(rb"(does not implement abstract method )`frida_[a-z0-9_]+'")
 
 
 def neutralize_task_names(source: bytes) -> bytes:
@@ -32,6 +36,11 @@ def neutralize_task_names(source: bytes) -> bytes:
 
 def neutralize_source_locations(source: bytes) -> bytes:
     return SOURCE_LINE.sub(lambda match: match[1] + match[2].replace(b"frida", b"meshlink") + match[3], source)
+
+
+def neutralize_diagnostics(source: bytes) -> bytes:
+    source = VALA_DIAGNOSTIC_FUNCTION.sub(rb'\g<1>"meshlink"', source)
+    return ABSTRACT_METHOD_DIAGNOSTIC.sub(rb'\g<1>from this interface', source)
 
 
 def neutralize_runtime_types(source: bytes) -> bytes:
@@ -66,7 +75,9 @@ def output_directory(arguments: list[str]) -> Path | None:
 def neutralize_directory(directory: Path) -> None:
     for generated in directory.rglob("*.c"):
         source = generated.read_bytes()
-        updated = neutralize_source_locations(neutralize_runtime_types(neutralize_task_names(source)))
+        updated = neutralize_source_locations(
+            neutralize_diagnostics(neutralize_runtime_types(neutralize_task_names(source)))
+        )
         if updated != source:
             generated.write_bytes(updated)
 
