@@ -1,5 +1,6 @@
 [dependencies]
-version = "20261004"
+version = "20261015-meshlink"
+toolchain_version = "20261004"
 bootstrap_version = "20250801"
 
 [ninja]

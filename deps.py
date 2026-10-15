@@ -130,6 +130,8 @@ def ensure_toolchain(machine: MachineSpec,
                      version: Optional[str] = None,
                      on_progress: ProgressCallback = print_progress) -> Tuple[Path, SourceState]:
     toolchain_prefix = query_toolchain_prefix(machine, cache_dir)
+    if version is None:
+        version = load_dependency_parameters().toolchain_version
     state = sync(Bundle.TOOLCHAIN, machine, toolchain_prefix, version, on_progress)
     return (toolchain_prefix, state)
 
@@ -1008,7 +1010,8 @@ def compute_bundle_parameters(bundle: Bundle,
     else:
         os_arch_config = machine.identifier
     filename = f"{bundle.name.lower()}-{os_arch_config}.tar.xz"
-    url = BUNDLE_URL.format(version=version, filename=filename)
+    url_template = FORK_SDK_URL if bundle == Bundle.SDK and version.endswith("-meshlink") else BUNDLE_URL
+    url = url_template.format(version=version, filename=filename)
     return (url, filename)
 
 
@@ -1041,7 +1044,8 @@ def load_dependency_parameters() -> DependencyParameters:
                                            pkg.get("when"))
 
     p = config["dependencies"]
-    return DependencyParameters(p["version"], p["bootstrap_version"], packages)
+    return DependencyParameters(p["version"], p.get("toolchain_version", p["version"]),
+                                p["bootstrap_version"], packages)
 
 
 def iterate_package_ids_in_dependency_order(packages: Sequence[PackageSpec]) -> Iterator[str]:
@@ -1132,6 +1136,7 @@ class CommandError(Exception):
 DEPS_TOML_PATH = RELENG_DIR / "deps.toml"
 
 BUNDLE_URL = "https://build.frida.re/deps/{version}/{filename}"
+FORK_SDK_URL = "https://github.com/360NENZ/frida/releases/download/sdk-{version}/{filename}"
 
 
 class Bundle(Enum):
@@ -1151,6 +1156,7 @@ class SourceState(Enum):
 @dataclass
 class DependencyParameters:
     deps_version: str
+    toolchain_version: str
     bootstrap_version: str
     packages: Dict[str, PackageSpec]
 
