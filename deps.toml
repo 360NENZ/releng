@@ -446,8 +446,8 @@ when = """ \
        } \
        """
 name = "TinyCC"
-version = "3da7432bebd348bf16cdc7a22c3717b4f22946af"
-url = "https://github.com/frida/tinycc.git"
+version = "017bbbb9f2fab3c8374c4b4a8b580d7676e739fa"
+url = "https://github.com/360NENZ/tinycc.git"
 dependencies = [
     { id = "picolibc", when = "machine.is_freestanding" },
     { id = "compiler-rt", when = "machine.is_freestanding" },
@@ -474,11 +474,11 @@ when = """ \
        and not machine.is_freestanding \
        """
 name = "V8"
-version = "a07af892420dfd873b33bd4ce4ba9d963072e1b9"
-url = "https://github.com/frida/v8.git"
+version = "8ecaf8c0a181222e3d047527973ccf9e798e8305"
+url = "https://github.com/360NENZ/v8.git"
 options = [
     "-Ddebug=false",
-    "-Dembedder_string=-frida",
+    "-Dembedder_string=-meshlink",
     "-Dsnapshot_compression=disabled",
     "-Dpointer_compression=disabled",
     "-Dshared_ro_heap=disabled",
