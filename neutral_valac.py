@@ -22,7 +22,7 @@ ENUM_VALUES = re.compile(
     rb'(static const G(?:Enum|Flags)Value values\[\]\s*=\s*\{)([^;]*)(\};)',
     re.DOTALL,
 )
-ENUM_VALUE_NAME = re.compile(rb'"FRIDA_([A-Z0-9_]+)"')
+ENUM_VALUE_NAME = re.compile(rb'"FRIDA_([A-Za-z0-9_]+)"')
 SOURCE_LINE = re.compile(rb'(?m)^(#line\s+\d+\s+")([^"\r\n]+)(")$')
 VALA_DIAGNOSTIC_FUNCTION = re.compile(
     rb'(?m)^(#define _vala_(?:assert|return_if_fail|return_val_if_fail|warn_if_fail)\([^\n]+?)G_STRFUNC'

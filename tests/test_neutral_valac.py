@@ -80,7 +80,8 @@ class NeutralValacTest(unittest.TestCase):
             b'g_type_register_fundamental (g_type_fundamental_next (), "FridaAcquiredRegion", &info, &fundamental, 0);\n'
             b'g_enum_register_static ("FridaRealm", values);\n'
             b'static const GEnumValue values[] = {{FRIDA_REALM_NATIVE, '
-            b'"FRIDA_REALM_NATIVE", "native"}, {0, NULL, NULL}};\n'
+            b'"FRIDA_REALM_NATIVE", "native"}, {FRIDA_FRUITY_KCDATA_ITEM_TYPE_ARRAY_PADa, '
+            b'"FRIDA_FRUITY_KCDATA_ITEM_TYPE_ARRAY_PADa", "array-pada"}, {0, NULL, NULL}};\n'
             b'G_DEFINE_TYPE_EXTENDED (FridaAuthenticationServiceProxy, '
             b'frida_authentication_service_proxy, G_TYPE_DBUS_PROXY, 0, )\n'
             b'G_DEFINE_TYPE_EXTENDED (FridaLinuxRemoteHelperProxy, '
@@ -103,6 +104,9 @@ class NeutralValacTest(unittest.TestCase):
         ).replace(
             b'"FRIDA_REALM_NATIVE", "native"',
             b'"MESHLINK_REALM_NATIVE", "native"',
+        ).replace(
+            b'"FRIDA_FRUITY_KCDATA_ITEM_TYPE_ARRAY_PADa", "array-pada"',
+            b'"MESHLINK_FRUITY_KCDATA_ITEM_TYPE_ARRAY_PADa", "array-pada"',
         ).replace(
             b'G_DEFINE_TYPE_EXTENDED (FridaAuthenticationServiceProxy, ',
             b'typedef FridaAuthenticationServiceProxy MeshlinkAuthenticationServiceProxy;\n'
