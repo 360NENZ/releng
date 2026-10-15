@@ -234,6 +234,8 @@ def generate_machine_config(machine: MachineSpec,
     if vala_compiler is not None:
         valac, vapidir = vala_compiler
         vala = [
+            sys.executable,
+            str(Path(__file__).resolve().parent / "neutral_valac.py"),
             str(valac),
             f"--vapidir={vapidir}",
         ]
