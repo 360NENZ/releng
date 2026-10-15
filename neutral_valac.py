@@ -14,6 +14,10 @@ DBUS_PROXY = re.compile(
     rb'G_DEFINE_TYPE_EXTENDED \((Frida[A-Za-z0-9_]+Proxy), '
     rb'([a-z][a-z0-9_]+), G_TYPE_DBUS_PROXY,'
 )
+ERROR_DOMAIN = re.compile(
+    rb'(\b(?:g_quark_from_static_string|g_dbus_error_register_error_domain)\s*\(\s*")'
+    rb'frida(-(?:[a-z0-9]+-)*error-quark")'
+)
 ENUM_VALUES = re.compile(
     rb'(static const G(?:Enum|Flags)Value values\[\]\s*=\s*\{)([^;]*)(\};)',
     re.DOTALL,
@@ -27,6 +31,7 @@ def neutralize_task_names(source: bytes) -> bytes:
 
 def neutralize_runtime_types(source: bytes) -> bytes:
     source = TYPE_NAME.sub(rb'\g<1>Meshlink\2', source)
+    source = ERROR_DOMAIN.sub(rb'\g<1>meshlink\2', source)
 
     def rename_dbus_proxy(match: re.Match[bytes]) -> bytes:
         name = match[1]

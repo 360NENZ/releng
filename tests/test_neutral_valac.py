@@ -40,6 +40,8 @@ class NeutralValacTest(unittest.TestCase):
             b'G_DEFINE_TYPE_EXTENDED (FridaLinuxRemoteHelperProxy, '
             b'frida_linux_remote_helper_proxy, G_TYPE_DBUS_PROXY, 0, )\n'
             b'G_DEFINE_TYPE_EXTENDED (FridaOtherObject, frida_other_object, G_TYPE_OBJECT, 0, )\n'
+            b'g_quark_from_static_string ("frida-fruity-plist-error-quark");\n'
+            b'g_dbus_error_register_error_domain ("frida-error-quark", &quark, entries, size);\n'
             b'const char * identifier = "FridaRealm";\n'
             b'const char * env = "FRIDA_TEST_OPTION";\n'
         )
@@ -65,6 +67,12 @@ class NeutralValacTest(unittest.TestCase):
             b'typedef FridaLinuxRemoteHelperProxy MeshlinkLinuxRemoteHelperProxy;\n'
             b'typedef FridaLinuxRemoteHelperProxyClass MeshlinkLinuxRemoteHelperProxyClass;\n'
             b'G_DEFINE_TYPE_EXTENDED (MeshlinkLinuxRemoteHelperProxy, ',
+        ).replace(
+            b'g_quark_from_static_string ("frida-fruity-plist-error-quark"',
+            b'g_quark_from_static_string ("meshlink-fruity-plist-error-quark"',
+        ).replace(
+            b'g_dbus_error_register_error_domain ("frida-error-quark"',
+            b'g_dbus_error_register_error_domain ("meshlink-error-quark"',
         )
         self.assertEqual(neutralize_runtime_types(source), expected)
 
