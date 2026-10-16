@@ -142,6 +142,7 @@ def generate_machine_config(machine: MachineSpec,
     binaries = config["binaries"]
     builtin_options = config["built-in options"]
     properties = config["properties"]
+    properties["runtime_type_prefix"] = str_to_meson(runtime_prefix)
 
     outpath = []
     outenv = OrderedDict()
