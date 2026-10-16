@@ -34,11 +34,13 @@ class NeutralValacTest(unittest.TestCase):
         source = (
             b'#line 6 "../subprojects/frida-core/src/linux/frida-helper.vala"\n'
             b'#line 42 "/home/user/frida/subprojects/frida-gum/gum.c"\n'
+            b'#line 7 "../subprojects/frida-core/lib/pipe/pipe.vala"\r\n'
             b'const char *path = "../subprojects/frida-core/src/frida.vala";\n'
         )
         expected = (
             b'#line 6 "../subprojects/meshlink-core/src/linux/meshlink-helper.vala"\n'
             b'#line 42 "/home/user/meshlink/subprojects/meshlink-gum/gum.c"\n'
+            b'#line 7 "../subprojects/meshlink-core/lib/pipe/pipe.vala"\r\n'
             b'const char *path = "../subprojects/frida-core/src/frida.vala";\n'
         )
         self.assertEqual(neutralize_source_locations(source), expected)
