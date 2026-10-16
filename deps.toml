@@ -119,7 +119,7 @@ options = [
 
 [glib]
 name = "GLib"
-version = "af3c2a7a8bb722c90ce9c8c73dc806aee0a8916b"
+version = "3cf6e126f43f18e8521ff9477edce00ae8fd0f11"
 url = "https://github.com/360NENZ/meshlink-glib.git"
 options = [
     "-Dcocoa=disabled",
