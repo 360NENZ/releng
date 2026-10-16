@@ -5,6 +5,8 @@ import os
 from pathlib import Path
 import platform
 import pprint
+import re
+import secrets
 import shlex
 import shutil
 import subprocess
@@ -72,6 +74,9 @@ def generate_machine_configs(build_machine: MachineSpec,
                              outdir: Path,
                              apple_min_os: Optional[Dict[str, str]] = None) -> Tuple[MachineConfig, MachineConfig]:
     is_cross_build = host_machine != build_machine
+    runtime_prefix = environ.get("FRIDA_RUNTIME_TYPE_PREFIX", "R" + secrets.token_hex(8).upper())
+    if re.fullmatch(r"[A-Z][A-Za-z0-9]*", runtime_prefix) is None:
+        raise ValueError("FRIDA_RUNTIME_TYPE_PREFIX must be an alphanumeric GType prefix starting with an uppercase letter")
 
     if is_cross_build:
         build_environ = {build_envvar_to_host(k): v for k, v in environ.items() if k not in TOOLCHAIN_ENVVARS}
@@ -88,7 +93,8 @@ def generate_machine_configs(build_machine: MachineSpec,
                                     call_selected_meson,
                                     default_library,
                                     outdir,
-                                    apple_min_os)
+                                    apple_min_os,
+                                    runtime_prefix)
 
     if is_cross_build:
         host_config = generate_machine_config(host_machine,
@@ -100,7 +106,8 @@ def generate_machine_configs(build_machine: MachineSpec,
                                               call_selected_meson,
                                               default_library,
                                               outdir,
-                                              apple_min_os)
+                                              apple_min_os,
+                                              runtime_prefix)
     else:
         host_config = build_config
 
@@ -116,7 +123,8 @@ def generate_machine_config(machine: MachineSpec,
                             call_selected_meson: Callable,
                             default_library: DefaultLibrary,
                             outdir: Path,
-                            apple_min_os: Optional[Dict[str, str]] = None) -> MachineConfig:
+                            apple_min_os: Optional[Dict[str, str]] = None,
+                            runtime_prefix: str = "Meshlink") -> MachineConfig:
     config = ConfigParser(dict_type=OrderedDict)
     config["constants"] = OrderedDict()
     config["binaries"] = OrderedDict()
@@ -236,6 +244,7 @@ def generate_machine_config(machine: MachineSpec,
         vala = [
             sys.executable,
             str(Path(__file__).resolve().parent / "neutral_valac.py"),
+            f"--runtime-prefix={runtime_prefix}",
             str(valac),
             f"--vapidir={vapidir}",
         ]
