@@ -1,5 +1,5 @@
 [dependencies]
-version = "20261015-meshlink"
+version = "20261016-meshlink"
 toolchain_version = "20261004"
 bootstrap_version = "20250801"
 
@@ -119,8 +119,8 @@ options = [
 
 [glib]
 name = "GLib"
-version = "e0cc7c6f0d88f47e4dee4607df085d08c89b8a6a"
-url = "https://github.com/frida/glib.git"
+version = "af3c2a7a8bb722c90ce9c8c73dc806aee0a8916b"
+url = "https://github.com/360NENZ/meshlink-glib.git"
 options = [
     "-Dcocoa=disabled",
     "-Dselinux=disabled",
