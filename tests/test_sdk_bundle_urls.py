@@ -17,24 +17,25 @@ class SdkBundleUrlsTest(unittest.TestCase):
         for machine in (
             "linux-x86_64",
             "android-arm64",
+            "macos-arm64",
             "windows-x86_64-md",
             "windows-x86_64-mt",
         ):
             with self.subTest(machine=machine):
                 filename = f"sdk-{machine}.tar.xz"
                 url, actual_filename = compute_bundle_parameters(
-                    Bundle.SDK, MachineSpec.parse(machine), "20261015-meshlink"
+                    Bundle.SDK, MachineSpec.parse(machine), "20261016-meshlink"
                 )
                 self.assertEqual(actual_filename, filename)
                 self.assertEqual(
                     url,
                     f"https://github.com/360NENZ/frida/releases/download/"
-                    f"sdk-20261015-meshlink/{filename}",
+                    f"sdk-20261016-meshlink/{filename}",
                 )
 
     def test_upstream_toolchain_version_remains_available(self):
         params = load_dependency_parameters()
-        self.assertEqual(params.deps_version, "20261015-meshlink")
+        self.assertEqual(params.deps_version, "20261016-meshlink")
         self.assertEqual(params.toolchain_version, "20261004")
 
         machine = MachineSpec.parse("windows-x86_64-mt")
